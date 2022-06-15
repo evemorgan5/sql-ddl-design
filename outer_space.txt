@@ -1,0 +1,49 @@
+CREATE TABLE moons (moon TEXT NOT NULL PRIMARY KEY, planet TEXT NOT NULL);
+INSERT INTO moons (moon, planet)
+VALUES ('The Moon', 'Earth'), ('Phobos', 'Mars'), ('Deimos', 'Mars');
+
+   moon   |  planet
+----------+-----------
+ The Moon | The Earth
+ Phobos   | Mars
+ Deimos   | Mars
+
+
+
+CREATE TABLE stars (star TEXT NOT NULL PRIMARY KEY, star_temp VARCHAR(8) NOT NULL);
+INSERT INTO stars(star, star_temp)
+VALUES ('The Sun', '5800°K'), ('Proxima Centauri', '3042°K'), ('Gliese 876', '3192°K');
+
+       star       | star_temp
+------------------+-----------
+ The Sun          | 5800°K
+ Proxima Centauri | 3042°K
+ Gliese 876       | 3192°K
+
+CREATE TABLE planets (planet TEXT NOT NULL PRIMARY KEY, orbit_period Float NOT NULL, orbits_around_star TEXT NOT NULL REFERENCES stars);
+INSERT INTO planets (planet, orbit_period, orbits_around_star)
+VALUES ('Earth', '1.00', 'The Sun'), ('Mars', '1.882', 'The Sun'), ('Venus', '0.62', 'The Sun'),
+('Proxima Centauri b', '0.03', 'Proxima Centauri'), ('Gliese 876 b', '0.236', 'Gliese 876');
+
+       planet       | orbit_period | orbits_around_star
+--------------------+--------------+--------------------
+ Earth              |            1 | The Sun
+ Mars               |        1.882 | The Sun
+ Venus              |         0.62 | The Sun
+ Proxima Centauri b |         0.03 | Proxima Centauri
+ Gliese 876 b       |        0.236 | Gliese 876
+
+
+SELECT planets.planet, orbits_around_star, COUNT(moon) AS moon_count
+FROM planets JOIN stars ON planets.orbits_around_star = stars.star
+LEFT JOIN moons ON planets.planet = moons.planet
+GROUP BY planets.planet, stars.star
+ORDER BY planets.planet;
+
+       planet       | orbits_around_star | moon_count
+--------------------+--------------------+------------
+ Earth              | The Sun            |          0
+ Gliese 876 b       | Gliese 876         |          0
+ Mars               | The Sun            |          2
+ Proxima Centauri b | Proxima Centauri   |          0
+ Venus              | The Sun            |          0
